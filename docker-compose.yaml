@@ -1,0 +1,45 @@
+version: '3.10'
+
+services:
+  web-server: # service name, maybe any
+    image: nginx:stable
+    container_name: mynginx
+    volumes:
+      - '/opt/lemp/nginx/html:/var/www/html'
+      - '/opt/lemp/nginx/conf:/etc/nginx/conf.d'
+    environment:
+      - 'NGNNX_HOST=web.example.com'
+      - 'NGINX_PORT=80'
+    ports:
+      - '80:80'
+      - '443:433'
+    networks:
+     - webnet
+    restart: unless-stopped # always/no/no-failure
+
+  php:
+    image: php:7.4-fpm
+    volumes:
+      - '/opt/lemp/nginx/html:/var/www/html'
+    networks:
+      - webnet
+    restart: unless-stopped
+
+  db:
+    image: mariadb
+    environment:
+      MARIADB_ROOT_PASSWORD: 123
+    restart: unless-stopped
+
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080
+    networks:
+      - webnet
+    restart: unless-stopped
+
+networks:
+  webnet:
+    driver: bridge
+    name: webnet
